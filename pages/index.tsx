@@ -1,11 +1,14 @@
+import { Typography } from '@mui/material'
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+
+import { ShopLayout } from '../components/layout'
 
 const Home: NextPage = () => {
   return (
-    <h1>NEXT JS DAB SHOP</h1>
+    <ShopLayout title={'DaB - SHOP - HOME'} pageDescription={'Encuentra los mejores productos de DAB aquí'}>
+      <Typography variant="h1" component='h1'>Tienda - HOME</Typography>
+      <Typography variant="h2" sx={{marginBottom: 1}}>Todos los Productos</Typography>
+    </ShopLayout>
   )
 }
 
