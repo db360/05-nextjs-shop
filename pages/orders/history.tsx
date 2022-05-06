@@ -11,7 +11,7 @@ const cols:GridColDef[] = [
         field: 'orden',
         headerName: 'Numero de Orden',
         description: 'Link Hacia la Orden de Compra',
-        width: 300,
+        width: 200,
         sortable:false,
         renderCell: (params:GridValueGetterParams) => {
             return (
@@ -26,7 +26,7 @@ const cols:GridColDef[] = [
     },
     {
         field: 'paid',
-        headerName: 'Pagada',
+        headerName: 'Estado',
         description: 'Muestra información, si la orden está pagada',
         width: 200,
         renderCell: (params:GridValueGetterParams) => {
