@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { Box, Button, CardActionArea, CardMedia, Grid, Link, Typography } from '@mui/material';
 import {initialData} from '../../database/products';
+import { FC } from 'react';
 import { ItemCounter } from '../ui';
 
 const productsInCart = [
@@ -9,7 +10,11 @@ const productsInCart = [
     initialData.products[2],
 ]
 
-export const CartList = () => {
+interface Props {
+    editable: boolean;
+}
+
+export const CartList:FC<Props> = ({editable = false}) => {
   return (
     <>
         {
@@ -17,11 +22,11 @@ export const CartList = () => {
                 <Grid container spacing={2} key={product.slug} sx={{mb:1}}>
                     <Grid item xs={3}>
                         {/* TODO:Redireccionar a la pagina del producto */}
-                        <NextLink href='product/slug'>
+                        <NextLink href='/product/slug' passHref>
                             <Link>
                                 <CardActionArea>
                                     <CardMedia
-                                        image={`products/${product.images[0]}`}
+                                        image={`/products/${product.images[0]}`}
                                         component='img'
                                         sx={{borderRadius: '5px'}}
                                     >
@@ -36,14 +41,23 @@ export const CartList = () => {
                             <Typography variant='body1'>Talla: <strong>M</strong></Typography>
 
                             {/* CONDICIONAL */}
-                            <ItemCounter />
+                            {
+                                editable
+                                ? <ItemCounter />
+                                : <Typography variant='h5'>3 Items</Typography>
+                            }
+
                         </Box>
                     </Grid>
                     <Grid item xs={2} display='flex' alignItems='center' flexDirection='column'>
                         <Typography variant='subtitle1'>{product.price}€</Typography>
-                        <Button   variant='text' color='secondary'>
-                            Eliminar
-                        </Button>
+                        {
+                            editable && (
+                                <Button   variant='text' color='secondary'>
+                                    Eliminar
+                                </Button>
+                            )
+                        }
                     </Grid>
                 </Grid>
             ))
