@@ -34,7 +34,8 @@ const productSchema = new Schema({
     timestamps: true // Crea timestamps al añadir y editar
 });
 
-// TODO: CREAR ÍNDICE DE MONGO
+//Crear un indice para el search
+productSchema.index({title: 'text', tags: 'text'});
 
 const Product: Model<IProduct> = mongoose.models.Product || model('Product', productSchema);
 //CREA EL MODELO, BUSCA EL MODELO QUE QUIERO CREAR, SI YA EXISTE USA ESE, SI NO SE CREA
