@@ -22,12 +22,12 @@ export const Navbar = () => {
                         <Button>Hombre</Button>
                     </Link>
                 </NextLink>
-                <NextLink href="/category/woman" passHref>
+                <NextLink href="/category/women" passHref>
                     <Link>
                         <Button>Mujer</Button>
                     </Link>
                 </NextLink>
-                <NextLink href="/category/children" passHref>
+                <NextLink href="/category/kids" passHref>
                     <Link>
                         <Button>Niño</Button>
                     </Link>
