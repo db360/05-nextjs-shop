@@ -1,12 +1,11 @@
 import type { AppProps } from "next/app";
-import "../styles/globals.css";
-import { CssBaseline, ThemeProvider } from "@mui/material";
 import { SWRConfig } from "swr";
+import "../styles/globals.css";
+import { CartProvider, UiProvider } from "../context";
+
+import { CssBaseline, ThemeProvider } from "@mui/material";
 
 import { lightTheme } from "../themes";
-import { UiProvider } from "../context";
-
-type Props = { children?: React.ReactNode };
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -16,12 +15,14 @@ function MyApp({ Component, pageProps }: AppProps) {
           fetch(resource, init).then((res) => res.json()),
       }}
     >
-      <UiProvider>
-        <ThemeProvider theme={lightTheme}>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </UiProvider>
+      <CartProvider>
+        <UiProvider>
+          <ThemeProvider theme={lightTheme}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </UiProvider>
+      </CartProvider>
     </SWRConfig>
   );
 }
