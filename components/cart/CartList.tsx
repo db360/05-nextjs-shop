@@ -1,14 +1,10 @@
 import NextLink from 'next/link';
 import { Box, Button, CardActionArea, CardMedia, Grid, Link, Typography } from '@mui/material';
 import {initialData} from '../../database/products';
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import { ItemCounter } from '../ui';
+import { CartContext } from '../../context';
 
-const productsInCart = [
-    initialData.products[0],
-    initialData.products[1],
-    initialData.products[2],
-]
 
 interface Props {
     editable: boolean;
@@ -16,10 +12,12 @@ interface Props {
 
 export const CartList:FC<Props> = ({editable = false}) => {
 
+    const { cart } = useContext(CartContext)
+
   return (
     <>
         {
-            productsInCart.map( product => (
+            cart.map( product => (
                 <Grid container spacing={2} key={product.slug} sx={{mb:1}}>
                     <Grid item xs={3}>
                         {/* TODO:Redireccionar a la pagina del producto */}
@@ -27,7 +25,7 @@ export const CartList:FC<Props> = ({editable = false}) => {
                             <Link>
                                 <CardActionArea>
                                     <CardMedia
-                                        image={`/products/${product.images[0]}`}
+                                        image={`/products/${product.image}`}
                                         component='img'
                                         sx={{borderRadius: '5px'}}
                                     >
@@ -44,13 +42,16 @@ export const CartList:FC<Props> = ({editable = false}) => {
                             {/* CONDICIONAL */}
                             {
                                 editable
-                                ? <ItemCounter
-                                    currentValue={0}
-                                    maxValue={0}
-                                    updatedQuantity={function (newValue: number): void {
-                                        throw new Error('Function not implemented.');
-                                    } } />
-                                : <Typography variant='h5'>3 Items</Typography>
+                                ? (
+                                    <ItemCounter
+                                        currentValue={product.quantity}
+                                        maxValue={ 10 }
+                                        updatedQuantity={() => {}}
+                                    />
+                                )
+                                : (
+                                    <Typography variant='h5'>{product.quantity} {product.quantity > 1 ? 'productos' : 'producto'}</Typography>
+                                )
                             }
 
                         </Box>
