@@ -15,6 +15,7 @@ interface Props {
 }
 
 export const CartList:FC<Props> = ({editable = false}) => {
+
   return (
     <>
         {
@@ -43,7 +44,12 @@ export const CartList:FC<Props> = ({editable = false}) => {
                             {/* CONDICIONAL */}
                             {
                                 editable
-                                ? <ItemCounter />
+                                ? <ItemCounter
+                                    currentValue={0}
+                                    maxValue={0}
+                                    updatedQuantity={function (newValue: number): void {
+                                        throw new Error('Function not implemented.');
+                                    } } />
                                 : <Typography variant='h5'>3 Items</Typography>
                             }
 

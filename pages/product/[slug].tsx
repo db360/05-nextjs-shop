@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { useRouter } from "next/router";
 import { NextPage, GetStaticPaths, GetStaticProps } from "next";
 
+import { CartContext } from "../../context";
 import { ICartProduct, IProduct, ISize } from "../../interfaces";
+
 import { dbProducts } from "../../database";
 import { Box, Button, Chip, Grid, Typography } from "@mui/material";
 
@@ -14,6 +17,9 @@ interface Props {
 }
 
 const ProductPage:NextPage<Props> = ({product}) => {
+
+  const router = useRouter();
+  const {addProductToCart} = useContext(CartContext)
 
   //Local state para validar talla
   const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
@@ -42,7 +48,12 @@ const ProductPage:NextPage<Props> = ({product}) => {
   }
 
   const onAddProduct = () => {
-    console.log({tempCartProduct})
+
+    if( !tempCartProduct.size) { return }
+
+    //TODO: llamar la accion del context para agregar al carrito
+    addProductToCart(tempCartProduct)
+    router.push('/cart')
   }
 
   return (
