@@ -1,5 +1,6 @@
 import { FC, useEffect, useReducer } from 'react';
 import Cookie from 'js-cookie';
+
 import {CartContext, cartReducer} from './'
 import { ICartProduct } from '../../interfaces';
 
@@ -39,15 +40,14 @@ export const CartProvider:FC<Props> = ({ children }) => {
 
      //Set items to cookies
      useEffect(() => {
-          Cookie.set('cart', JSON.stringify(state.cart), { expires: 1 });
-
+          Cookie.set('cart', JSON.stringify(state.cart));
      }, [state.cart]);
 
      useEffect(() => {
 
 
           const numberOfItems = state.cart.reduce(( prev, current ) => current.quantity + prev , 0);
-          const subTotal = state.cart.reduce((prev, current) => current.quantity * current.price + prev, 0);
+          const subTotal = state.cart.reduce((prev, current) => (current.quantity * current.price) + prev, 0);
           const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
 
           const orderSummary = {
@@ -106,4 +106,3 @@ export const CartProvider:FC<Props> = ({ children }) => {
      )
 }
 
-export default CartProvider
