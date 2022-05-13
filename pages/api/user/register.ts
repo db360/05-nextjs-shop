@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { db } from '../../../database';
 import { User } from '../../../models';
-import { jwt } from '../../../utils';
+import { jwt, validations } from '../../../utils';
 
 type Data =
 | {message: string}
@@ -42,15 +42,19 @@ const registerUser = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
             message: 'El Nombre debe de tener al menos 4 carácteres'
         })
     }
-    //TODO: VALIDAR EMAIL
-    // if(email)
+
+    if( !validations.isValidEmail(email)) {
+        return res.status(400).json({
+            message: 'El Correo no parece ser válido'
+        })
+    }
 
     await db.connect();
     const user = await User.findOne({ email });
 
     if ( user ) {
         return res.status(400).json({
-            message:'Correo Ya registrado'
+            message:'Correo ya registrado'
         })
     }
 
