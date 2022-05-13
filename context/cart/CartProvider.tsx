@@ -8,10 +8,18 @@ type Props = { children?: React.ReactNode };
 
 export interface CartState {
      cart: ICartProduct[];
+     numberOfItems: number;
+     subTotal: number;
+     tax: number;
+     total: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
-    cart: [],
+     cart: [],
+     numberOfItems: 0,
+     subTotal: 0,
+     tax: 0,
+     total: 0,
 }
 
 export const CartProvider:FC<Props> = ({ children }) => {
@@ -22,26 +30,41 @@ export const CartProvider:FC<Props> = ({ children }) => {
 
      useEffect(() => {
           try {
-               const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): [];
+               const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): []
                dispatch({type: '[Cart] - Load Cart From Cookies | Storage', payload: cookieProducts});
           } catch (error) {
                dispatch({type: '[Cart] - Load Cart From Cookies | Storage', payload: []});
           }
-     }, [])
+     }, []);
 
      //Set items to cookies
      useEffect(() => {
-          Cookie.set('cart', JSON.stringify(state.cart));
+          Cookie.set('cart', JSON.stringify(state.cart), { expires: 1 });
+
+     }, [state.cart]);
+
+     useEffect(() => {
+
+
+          const numberOfItems = state.cart.reduce(( prev, current ) => current.quantity + prev , 0);
+          const subTotal = state.cart.reduce((prev, current) => current.quantity * current.price + prev, 0);
+          const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
+
+          const orderSummary = {
+               numberOfItems,
+               subTotal,
+               tax: subTotal * taxRate,
+               total: subTotal * (taxRate + 1)
+          }
+
+          dispatch({type: '[Cart] - Update Order Summary', payload: orderSummary});
 
      }, [state.cart])
 
+
+
      const addProductToCart = (product: ICartProduct) => {
-          // Primera solucion
-          // dispatch({type: '[Cart] - Add Product', payload: product})
-          //Segunda solucion
-          // const productsInCart = state.cart.filter(p => p._id !== product._id && product.size !== product.size)
-          // dispatch({type: '[Cart] - Add Product', payload: productsInCart, product})
-          //FINAL-BUENA
+
           const productInCart = state.cart.some( p => p._id === product._id ); // si existe product in Cart es un true
           if(!productInCart) return dispatch({type: '[Cart] - Update Products in Cart', payload: [...state.cart, product]})
 
@@ -61,12 +84,22 @@ export const CartProvider:FC<Props> = ({ children }) => {
           dispatch({type: '[Cart] - Update Products in Cart', payload: updatedProducts})
      }
 
+     const updateCartQuantity = ( product: ICartProduct) => {
+          dispatch({type: '[Cart] - Update Cart Quantity in Cart', payload: product })
+     }
+     const removeCartProduct = ( product: ICartProduct) => {
+          dispatch({type: '[Cart] - Remove Product in Cart', payload: product })
+     }
+
      return (
           <CartContext.Provider value={{
                ...state,
 
                //Methods
                addProductToCart,
+               updateCartQuantity,
+               removeCartProduct,
+
           }}>
                {children}
           </CartContext.Provider>
