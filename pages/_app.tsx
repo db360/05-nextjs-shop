@@ -1,7 +1,8 @@
 import type { AppProps } from "next/app";
 import { SWRConfig } from "swr";
 import "../styles/globals.css";
-import { CartProvider, UiProvider } from "../context";
+
+import { AuthProvider, CartProvider, UiProvider } from "../context";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
@@ -15,14 +16,16 @@ function MyApp({ Component, pageProps }: AppProps) {
           fetch(resource, init).then((res) => res.json()),
       }}
     >
-      <CartProvider>
-        <UiProvider>
-          <ThemeProvider theme={lightTheme}>
-            <CssBaseline />
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </UiProvider>
-      </CartProvider>
+      <AuthProvider isLoggedIn={false}>
+        <CartProvider>
+          <UiProvider>
+            <ThemeProvider theme={lightTheme}>
+              <CssBaseline />
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </UiProvider>
+        </CartProvider>
+      </AuthProvider>
     </SWRConfig>
   );
 }
