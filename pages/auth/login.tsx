@@ -15,7 +15,7 @@ type FormData = {
 
 const LoginPage = () => {
   const { register, handleSubmit, formState: { errors }, } = useForm<FormData>();
-  const [showError, setshowError] = useState(false)
+  const [showError, setshowError] = useState(false);
 
   const onLoginUser = async({email, password}: FormData) => {
 
@@ -31,11 +31,13 @@ const LoginPage = () => {
       setshowError(true);
       setTimeout(() => {setshowError(false) }, 3500);
     }
+
+    // TODO: NAVEGAR A LA PANTALLA EN LA QUE ESTABA EL USUARIO
   }
 
   return (
     <AuthLayout title={"Ingresar"}>
-      <form onSubmit={ handleSubmit(onLoginUser) }>
+      <form onSubmit={ handleSubmit(onLoginUser) } noValidate>
         <Box sx={{ width: 350, padding: "10px 20px" }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
