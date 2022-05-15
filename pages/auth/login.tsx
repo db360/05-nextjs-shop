@@ -6,7 +6,9 @@ import { AuthLayout } from "../../components/layout";
 import { validations } from "../../utils";
 import { shopApi } from "../../api";
 import { ErrorOutline } from "@mui/icons-material";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context";
+import { useRouter } from "next/router";
 
 type FormData = {
   email: string;
@@ -14,25 +16,27 @@ type FormData = {
 };
 
 const LoginPage = () => {
+
+  const router = useRouter();
+  const { loginUser } = useContext(AuthContext)
+
   const { register, handleSubmit, formState: { errors }, } = useForm<FormData>();
   const [showError, setshowError] = useState(false);
 
   const onLoginUser = async({email, password}: FormData) => {
 
     setshowError(false);
+    const isValidLogin = await loginUser(email, password);
 
-    try {
-      const { data } = await shopApi.post('/user/login', { email, password });
-      const { token, user } = data;
-      console.log({token, user});
-
-    } catch (error) {
-      console.log('Error en las Credenciales');
+    if(!isValidLogin) {
       setshowError(true);
       setTimeout(() => {setshowError(false) }, 3500);
+      return;
     }
 
+
     // TODO: NAVEGAR A LA PANTALLA EN LA QUE ESTABA EL USUARIO
+    router.replace('/');
   }
 
   return (
