@@ -1,6 +1,8 @@
-import { FC, PropsWithChildren, useReducer } from 'react';
-import {AuthContext, authReducer} from './'
+import { FC, PropsWithChildren, useEffect, useReducer } from 'react';
+import { useRouter } from 'next/router';
 import axios, { AxiosError } from 'axios';
+
+import {AuthContext, authReducer} from './';
 
 import { IUser } from '../../interfaces';
 import { shopApi } from '../../api';
@@ -19,9 +21,38 @@ const AUTH_INITIAL_STATE: AuthState = {
 
 export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
 
+     const router = useRouter();
+
      const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE)
 
+     useEffect(() => {
+          checkToken();
+     }, [])
+
+     const checkToken = async () => {
+
+          if( !Cookies.get('token')) {
+               return;
+          }
+
+          try {
+               //llamar al endpoint
+               const { data } = await shopApi.get('/user/validate-token');
+               const { token, user } = data;
+               //revalidar token guardando el nuevo
+               Cookies.set('token', token);
+               //dispatch login
+               dispatch({type: '[Auth] - LogIn', payload: user});
+          } catch (error) {
+               // borrar el token de las cookies si hay error
+               Cookies.remove('token');
+          }
+
+     }
+
      const loginUser = async(email:string, password: string ):Promise<boolean> => {
+
+
           try {
                const { data } = await shopApi.post('/user/login', {email, password});
                const { token, user } = data;
@@ -60,6 +91,13 @@ export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
           }
      }
 
+     const logOut = () => {
+          Cookies.remove('token');
+          Cookies.remove('cart');
+          router.reload();
+
+     }
+
      return (
           <AuthContext.Provider value={{
                ...state,
@@ -67,6 +105,7 @@ export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
                //Methods
                loginUser,
                registerUser,
+               logOut,
 
           }}>
                {children}

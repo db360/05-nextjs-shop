@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useRouter } from 'next/router';
+import {useRouter} from "next/router";
 import NextLink from 'next/link';
 
 import { useForm } from 'react-hook-form';
@@ -41,10 +41,12 @@ const RegisterPage = () => {
             return;
         }
 
-        // Todo: navegar a la pantalla que el usuario estaba
-        router.replace('/');
+        // navegar a la pantalla que el usuario estaba
+        const destination = router.query.p?.toString() || '/';
+        router.replace(destination);
 
     }
+
 
     return (
         <AuthLayout title={'Ingresar'}>
@@ -118,7 +120,9 @@ const RegisterPage = () => {
                         </Grid>
 
                         <Grid item xs={12} display='flex' justifyContent='end'>
-                            <NextLink href="/auth/login" passHref>
+                            <NextLink
+                                href={router.query.p ? `/auth/login?p=${router.query.p}` : '/auth/login' }
+                                passHref>
                                 <Link underline='always'>
                                     ¿Ya tienes cuenta?
                                 </Link>
