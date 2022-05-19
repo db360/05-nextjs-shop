@@ -1,5 +1,10 @@
-import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material"
-import { ShopLayout } from "../../components/layout"
+import { GetServerSideProps} from 'next';
+
+import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
+
+import { ShopLayout } from "../../components/layout";
+import { jwt } from '../../utils';
+
 
 const AddressPage = () => {
   return (
@@ -52,6 +57,45 @@ const AddressPage = () => {
         </Box>
     </ShopLayout>
   )
+}
+
+//verificacion lado servidor
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+
+    const { token = '' } = req.cookies;
+    let isValidToken = false;
+
+    try {
+        await jwt.isValidToken( token );
+        isValidToken = true;
+    } catch (error) {
+        isValidToken = false;
+    }
+
+    if ( !isValidToken ) {
+        return {
+            redirect: {
+                destination: '/auth/login?p=/checkout/address',
+                permanent: false,
+            }
+        }
+    }
+
+    return {
+        props: {
+
+        }
+    }
 }
 
 export default AddressPage
