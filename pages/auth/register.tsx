@@ -26,6 +26,7 @@ const RegisterPage = () => {
 
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    
     const [ showError, setShowError ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
 
