@@ -6,6 +6,7 @@ import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from 
 import { CartContext } from '../../context';
 import { ShopLayout } from "../../components/layout";
 import { CartList, OrdenSummary } from "../../components/cart";
+import { countries } from '../../utils';
 
 const SummaryPage = () => {
 
@@ -40,10 +41,10 @@ const SummaryPage = () => {
                             </NextLink>
                         </Box>
 
-                        <Typography>{firstName}{lastName}</Typography>
+                        <Typography>{firstName} {lastName}</Typography>
                         <Typography>{address} {address2 ? `, ${address2}` : ''}</Typography>
                         <Typography>{city}, {zip}</Typography>
-                        <Typography>{country}</Typography>
+                        <Typography>{countries.find( c => c.code === country)?.name}</Typography>
                         <Typography>{phone}</Typography>
                         <Divider sx={{my: 1}}/>
 
