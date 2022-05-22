@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github"
-import Credentials from "next-auth/providers/credentials"
+import GithubProvider from "next-auth/providers/github";
+import TwitterProvider from "next-auth/providers/twitter";
+import Credentials from "next-auth/providers/credentials";
+
 import { dbUsers } from "../../../database";
 
 
 export default NextAuth({
-
 
   // Configure one or more authentication providers
   providers: [
@@ -18,10 +19,8 @@ export default NextAuth({
       async authorize(credentials) {
 
         console.log(credentials);
-        //TODO: Validar con la base de datos
 
-        // return {name: 'Juan', correo: 'juan@juan.com', role: 'admin'};
-
+        //Validar con la base de datos
         return await dbUsers.checkUserEmailPassword(credentials!.email, credentials!.password);
       }
     }),
@@ -29,7 +28,24 @@ export default NextAuth({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
+    TwitterProvider({
+      clientId: process.env.TWITTER_ID || '',
+      clientSecret: process.env.TWITTER_SECRET || '',
+      version: '2.0'
+    }),
+
   ],
+  //Custom Pages:
+  pages: {
+    signIn: '/auth/login',
+    newUser: '/auth/register',
+  },
+
+  session: {
+    maxAge: 2592000, //cada 30d
+    strategy: 'jwt',
+    updateAge: 86400, // cada dia
+  },
 
   //Callbacks
   callbacks: {
@@ -42,7 +58,7 @@ export default NextAuth({
 
         switch(account.type) {
           case 'oauth':
-            //TODO: crear usuario o verificar si existe en la bd
+            token.user = await dbUsers.oAuthToDbUser(user?.email || '', user?.name || '');
           break;
 
           case 'credentials':
@@ -54,7 +70,7 @@ export default NextAuth({
       return token;
     },
 
-    async session({session, token, user}) {
+    async session({session, token}) {
       // console.log({session, token, user});
       session.accessToken = token.accessToken;
       session.user = token.user as any;

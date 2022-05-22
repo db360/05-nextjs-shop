@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useReducer } from 'react';
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router';
+import { useSession, signOut } from 'next-auth/react'
 import axios, { AxiosError } from 'axios';
 
 import {AuthContext, authReducer} from './';
@@ -30,7 +30,7 @@ export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
      useEffect(() => {
           if(status === 'authenticated') {
                console.log({user: data?.user})
-               //TODO: // dispatch({type: '[Auth] - LogIn', payload: data?.user as IUser})
+               dispatch({type: '[Auth] - LogIn', payload: data?.user as IUser})
           }
      }, [status, data])
 
@@ -102,9 +102,7 @@ export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
      }
 
      const logOut = () => {
-          Cookies.remove('token');
           Cookies.remove('cart');
-
           Cookies.remove('address');
           Cookies.remove('lastName');
           Cookies.remove('firstName');
@@ -114,7 +112,10 @@ export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
           Cookies.remove('country');
           Cookies.remove('phone');
 
-          router.reload();
+          signOut();
+
+          // Cookies.remove('token');
+          // router.reload();
 
      }
 

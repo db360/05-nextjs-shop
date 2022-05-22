@@ -1,6 +1,8 @@
 import { useState, useContext } from 'react';
+import { GetServerSideProps } from 'next';
 import {useRouter} from "next/router";
 import NextLink from 'next/link';
+import { getSession, signIn } from 'next-auth/react';
 
 import { useForm } from 'react-hook-form';
 
@@ -26,7 +28,7 @@ const RegisterPage = () => {
 
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
-    
+
     const [ showError, setShowError ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
 
@@ -42,9 +44,11 @@ const RegisterPage = () => {
             return;
         }
 
-        // navegar a la pantalla que el usuario estaba
-        const destination = router.query.p?.toString() || '/';
-        router.replace(destination);
+        /*// navegar a la pantalla que el usuario estaba
+        // const destination = router.query.p?.toString() || '/';
+        // router.replace(destination);*/
+        await signIn('credentials',{email, password, })
+
 
     }
 
@@ -135,5 +139,24 @@ const RegisterPage = () => {
         </AuthLayout>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({req, query}) => {
+
+    const session = await getSession({req});
+    const {p = '/'} = query;
+
+    if (session) {
+      return {
+        redirect: {
+          destination: p.toString(),
+          permanent: false
+        }
+      }
+    }
+
+    return {
+      props: {}
+    }
+  }
 
 export default RegisterPage
