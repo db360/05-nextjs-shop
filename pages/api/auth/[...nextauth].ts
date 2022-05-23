@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import TwitterProvider from "next-auth/providers/twitter";
+import InstagramProvider from "next-auth/providers/instagram";
+import FacebookProvider from "next-auth/providers/facebook";
 import Credentials from "next-auth/providers/credentials";
 
 import { dbUsers } from "../../../database";
@@ -28,12 +30,19 @@ export default NextAuth({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_ID || '',
-      clientSecret: process.env.TWITTER_SECRET || '',
-      version: '2.0'
-    }),
-
+    // TwitterProvider({
+    //   clientId: "process.env.TWITTER_CONSUMER_KEY",
+    //   clientSecret: "process.env.TWITTER_CONSUMER_SECRET",
+    //   version: "2.0"
+    // }),
+    // InstagramProvider({
+    //   clientId: process.env.INSTAGRAM_CONSUMER_KEY,
+    //   clientSecret: process.env.INSTAGRAM_CONSUMER_SECRET,
+    // }),
+    // FacebookProvider({
+    //   clientId: 'process.env.INSTAGRAM_CONSUMER_KEY',
+    //   clientSecret: 'process.env.INSTAGRAM_CONSUMER_SECRET',
+    // }),
   ],
   //Custom Pages:
   pages: {
