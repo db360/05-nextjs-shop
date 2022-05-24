@@ -8,18 +8,22 @@ import Cookies from 'js-cookie';
 import { CartContext } from '../../context';
 import { ShopLayout } from "../../components/layout";
 import { CartList, OrdenSummary } from "../../components/cart";
-import { countries } from '../../utils';
+// import { countries } from '../../utils';
 
 const SummaryPage = () => {
 
     const router = useRouter();
-    const {shippingAddress, numberOfItems} = useContext(CartContext)
+    const {shippingAddress, numberOfItems, createOrder} = useContext(CartContext)
 
     useEffect(() => {
       if( !Cookies.get('firstName')) {
         router.push('/checkout/address')
       }
-    }, [router])
+    }, [router]);
+
+    const onCreateOrder = () => {
+        createOrder();
+    }
 
 
     if(!shippingAddress) {
@@ -70,6 +74,7 @@ const SummaryPage = () => {
 
                         <Box sx={{mt: 3}}>
                             <Button
+                                onClick={onCreateOrder}
                                 color='secondary'
                                 className='circular-btn'
                                 fullWidth

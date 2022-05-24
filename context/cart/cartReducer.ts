@@ -1,6 +1,5 @@
-import { ICartProduct } from '../../interfaces';
+import { ICartProduct, ShippingAddress } from '../../interfaces';
 import { CartState } from './';
-import {ShippingAddress} from './'
 
 type CartActionType =
    |{ type: '[Cart] - Load Cart From Cookies | Storage', payload: ICartProduct[]}
