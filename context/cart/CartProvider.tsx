@@ -1,4 +1,5 @@
 import { FC, useEffect, useReducer } from 'react';
+import axios, {AxiosError} from 'axios';
 import Cookies from 'js-cookie';
 
 import {CartContext, cartReducer} from './'
@@ -89,7 +90,7 @@ export const CartProvider:FC<Props> = ({ children }) => {
 
      }, [state.cart]);
 
-     const createOrder = async() => {
+     const createOrder = async():Promise<{hasError: boolean; message: string;}> => {
 
           if(!state.shippingAddress) {
                throw new Error('No hay dirección de entrega')
@@ -109,11 +110,29 @@ export const CartProvider:FC<Props> = ({ children }) => {
           }
 
           try {
-               const {data} = await shopApi.post('/orders', body)
-               console.log(data);
-          } catch (error) {
-               console.log(error);
+               const {data} = await shopApi.post<IOrder>('/orders', body)
+               // console.log(data);
 
+               //Dispatch de la accion(vaciar el carrito, limpiar state)
+               dispatch({type: '[Cart] - Order Completed'});
+
+               return {
+                    hasError: false,
+                    message: data._id!
+               }
+
+          } catch (err) {
+               if(axios.isAxiosError(err)) {
+                    const error = err as AxiosError
+                    return {
+                         hasError: true,
+                         message: error.message
+                    }
+               }
+               return {
+                    hasError: true,
+                    message: 'Error Inesperado, por favor pongase en contacto con el administrador'
+               }
           }
 
      }
