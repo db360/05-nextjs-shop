@@ -61,6 +61,7 @@ const createOrder= async(req: NextApiRequest, res: NextApiResponse<Data>) => {
     // Todas las validaciones son correctas
     const userId = session.user._id;
     const newOrder = new Order({...req.body, isPaid: false, user: userId });
+    newOrder.total = Math.round(newOrder.total * 100) / 100;
 
     // Guardar la orden en la bd
     await newOrder.save();

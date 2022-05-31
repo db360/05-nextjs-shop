@@ -30,6 +30,8 @@ const orderSchema = new Schema({
         isPaid          : { type: Boolean, required: true, default: false},
         paidAt          : { type: String },
 
+        transactionId   : { type: String},   /* columna transaction para la pasarela de pago*/
+
 }, {
     timestamps: true,
 });

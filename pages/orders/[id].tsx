@@ -1,12 +1,13 @@
 import { GetServerSideProps, NextPage } from 'next'
 import NextLink from 'next/link';
 import { getSession } from 'next-auth/react';
+import { PayPalButtons } from "@paypal/react-paypal-js";
 
-import { Box, Button, Card, CardContent, Chip, Divider, Grid, Link, Typography } from "@mui/material";
+import { Box, Card, CardContent, Chip, Divider, Grid, Link, Typography } from "@mui/material";
 
 import { ShopLayout } from "../../components/layout";
 import { CartList, OrdenSummary } from "../../components/cart";
-import { CreditCardOffOutlined, CreditScoreOutlined } from '@mui/icons-material';
+import { CreditScoreOutlined } from '@mui/icons-material';
 import { dbOrders } from '../../database';
 import { IOrder } from '../../interfaces';
 
@@ -14,7 +15,7 @@ interface Props {
     order: IOrder;
 }
 
-const OrderPage:NextPage<Props> = ({order}, req) => {
+const OrderPage:NextPage<Props> = ({order}) => {
 
     const {shippingAddress} = order;
 
@@ -94,7 +95,26 @@ const OrderPage:NextPage<Props> = ({order}, req) => {
                                         icon={<CreditScoreOutlined />}
                                     />
                                 ):(
-                                    <h1>Pagar</h1>
+                                    <PayPalButtons
+                                        createOrder={(data, actions) => {
+                                            return actions.order.create({
+                                                purchase_units: [
+                                                    {
+                                                        amount: {
+                                                            value: `${order.total}`,
+                                                        },
+                                                    },
+                                                ],
+                                            });
+                                        }}
+                                        onApprove={(data, actions) => {
+                                            return actions.order!.capture().then((details) => {
+                                                console.log({details}) // details devuelve el id con el estado de la transaccion id:'651651' intent: 'CAPTURE', links: 'url para confirmar'
+                                                const name = details.payer.name!.given_name;
+                                                alert(`Transaction completed by ${name}`);
+                                            });
+                                        }}
+                                    />
                                 )
                             }
 

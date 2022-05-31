@@ -6,18 +6,17 @@ import { Chip, Grid, Link, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 
 import { ShopLayout } from "../../components/layout";
-import { redirect } from 'next/dist/server/api-utils';
 import { dbOrders } from '../../database';
 import { IOrder } from '../../interfaces';
 
 const cols:GridColDef[] = [
     {field: 'id', headerName: 'ID', width: 100},
-    {field: 'fullname', headerName: 'Nombre Completo', width: 300},
+    {field: 'fullname', headerName: 'Nombre Completo', width: 240},
     {
         field: 'orden',
         headerName: 'Numero de Orden',
         description: 'Link Hacia la Orden de Compra',
-        width: 200,
+        width: 160,
         sortable:false,
         renderCell: (params:GridValueGetterParams) => {
             return (
@@ -66,7 +65,7 @@ const HistoryPage:NextPage<Props> = ({orders}) => {
     <ShopLayout title={"Historial de Ordenes"} pageDescription={"Historial de órdenes de compra del cliente"}>
         <Typography variant="h1" component="h1">Historial de Órdenes</Typography>
 
-        <Grid  container className="fadeInp">
+        <Grid  container className="fadeInp" sx={{width: '100%'}}>
             <Grid item xs={12} sx={{height: 650, width: '100%'}}>
                 <DataGrid
                     rows={rows}
