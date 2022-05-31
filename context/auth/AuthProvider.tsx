@@ -23,7 +23,6 @@ const AUTH_INITIAL_STATE: AuthState = {
 
 export const AuthProvider:FC<PropsWithChildren<AuthState>> = ({ children }) => {
 
-     const router = useRouter();
      const {data, status} = useSession();
      const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE)
 
