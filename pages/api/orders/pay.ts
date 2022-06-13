@@ -75,9 +75,9 @@ const  payOrder = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
         }
     });
 
-    console.log({data});
+    // console.log({data});
 
-    console.log({transactionId, orderId});
+    // console.log({transactionId, orderId});
 
     if(data.status !== 'COMPLETED') {
         return res.status(401).json({message: 'Orden no reconocida'})
@@ -99,6 +99,7 @@ const  payOrder = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
     dbOrder.transactionId = transactionId;
     dbOrder.isPaid = true;
     await dbOrder.save();
+    // todo: servicio de notificacion de mail
     await db.disconnect();
 
     res.status(200).json({ message: 'Orden Pagada'  })
