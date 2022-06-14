@@ -3,7 +3,7 @@ import {useRouter} from "next/router";
 
 import { AuthContext, UiContext } from "../../context";
 
-import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material";
+import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, DashboardOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material";
 import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material";
 
 export const SideMenu = () => {
@@ -148,6 +148,16 @@ export const SideMenu = () => {
                         <>
                             <Divider />
                             <ListSubheader>Admin Panel</ListSubheader>
+
+                            <ListItem
+                                button
+                                onClick={() => navigateTo("/admin/") }
+                            >
+                                <ListItemIcon>
+                                    <DashboardOutlined />
+                                </ListItemIcon>
+                                <ListItemText primary={'Dashboard'} />
+                            </ListItem>
 
                             <ListItem button>
                                 <ListItemIcon>
