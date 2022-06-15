@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         numberOfProducts,
         productsWithNoInventory,
         lowInventory,
-    ] = await Promise.all([ //Lo metemos todo en la promise para que se hagan paralelamente
+    ] = await Promise.all([ //Lo metemos todo en la promise para que se hagan paralelamente, por orden en el array de entrada
             Order.count(), // Sacar el numero de ordenes de la base de datos
             Order.find({isPaid: true}).count(), // Buscamos las
             User.find({ role: 'client' }).count(), // contamos
