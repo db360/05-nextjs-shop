@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { AdminLayout } from '../../components/layout'
+import useSWR from 'swr';
 
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { PeopleOutline } from '@mui/icons-material'
 import { Grid, MenuItem, Select } from '@mui/material';
-import useSWR from 'swr';
+import { PeopleOutline } from '@mui/icons-material'
+
 import { IUser } from '../../interfaces';
 import { shopApi } from '../../api';
 
@@ -12,20 +13,38 @@ import { shopApi } from '../../api';
 const UsersPage = () => {
 
     const {data, error} = useSWR<IUser[]>('/api/admin/users');
+    const [users, setUsers] = useState<IUser[]>([]);
 
-    if(!data && !error) return (<></>)
+    useEffect(() => {
+      if(data) {
+        setUsers(data)
+      }
+    }, [data]);
+
+
+    if(!data && !error) return (<></>);
 
     const onRoleUpdate = async(userId: string, newRole: string) => {
+
+        const previousUsers = users.map( user => ({...user}));
+
+        const updatedUsers = users.map( user => ({
+            ...user,
+            role: userId === user._id ? newRole : user.role
+        }))
+
+        setUsers(updatedUsers);
 
         try {
             await shopApi.put('/admin/users', { userId, role: newRole});
 
         } catch (error) {
+            setUsers(previousUsers);
             alert('No se pudo actualizar el rol del usuario')
             console.log(error);
         }
 
-    }
+    };
 
     const cols: GridColDef[] = [
         {field: 'email', headerName: 'Correo', width: 250},
@@ -54,7 +73,7 @@ const UsersPage = () => {
         },
     ];
 
-    const rows = data!.map(user => ({
+    const rows = users.map(user => ({
         id: user._id,
         email: user.email,
         name: user.name,
