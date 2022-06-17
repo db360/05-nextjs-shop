@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
 import { useForm } from 'react-hook-form';
 
@@ -34,9 +34,35 @@ interface Props {
 
 const ProductAdminPage:FC<Props> = ({ product }) => {
 
-    const { register, handleSubmit, formState: { errors }, getValues, setValue } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm<FormData>({
         defaultValues: product
     });
+
+    useEffect(() => {
+        const subscription = watch( ( value, {name, type} ) => {  // subscription para manejar el watch y poder pararlo en el return
+            console.log({value, name, type})
+            if( name === 'title' ) {
+                const newSlug = value.title?.trim()
+                    .replaceAll(' ', '_')
+                    .replaceAll("'", '')
+                    .toLocaleLowerCase() || '';
+
+                setValue('slug', newSlug);
+            }
+        } )
+      return () => subscription.unsubscribe();
+
+    }, [watch, setValue])
+
+
+    const onSizesChange = ( size: string) => {
+        const currentSizes = getValues('sizes');
+        if(currentSizes.includes( size )) {
+            return setValue('sizes', currentSizes.filter( s => s !== size ), { shouldValidate: true } );
+        }
+
+        setValue('sizes', [...currentSizes, size]);
+    }
 
     const onDeleteTag = ( tag: string ) => {
 
@@ -73,11 +99,12 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             variant="filled"
                             fullWidth
                             sx={{ mb: 1 }}
-                            { ...register('description', {
+                            { ...register('title', {
                                 required: 'Este título es requerido',
+                                minLength: { value: 2, message: 'Mínimo 2 caracteres' }
                             })}
-                            error={ !!errors.description }
-                            helperText={ errors.description?.message }
+                            error={ !!errors.title }
+                            helperText={ errors.title?.message }
                         />
 
                         <TextField
@@ -86,12 +113,12 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             fullWidth
                             multiline
                             sx={{ mb: 1 }}
-                            { ...register('title', {
+                            { ...register('description', {
                                 required: 'Este título es requerido',
-                                minLength: { value: 2, message: 'Mínimo 2 caracteres' }
                             })}
-                            error={ !!errors.title }
-                            helperText={ errors.title?.message }
+                            error={ !!errors.description }
+                            helperText={ errors.description?.message }
+
                         />
 
                         <TextField
@@ -169,7 +196,12 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             <FormLabel>Tallas</FormLabel>
                             {
                                 validSizes.map(size => (
-                                    <FormControlLabel key={size} control={<Checkbox />} label={ size } />
+                                    <FormControlLabel
+                                        key={size}
+                                        control={ <Checkbox checked={ getValues('sizes').includes(size) } /> }
+                                        label={ size }
+                                        onChange={ ()=> onSizesChange(size) }
+                                    />
                                 ))
                             }
                         </FormGroup>
