@@ -1,5 +1,6 @@
+import NextLink from 'next/link';
 import { CategoryOutlined } from '@mui/icons-material'
-import { CardMedia, Grid } from '@mui/material'
+import { CardMedia, Grid, Link } from '@mui/material'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import useSWR from 'swr';
 import { AdminLayout  } from '../../components/layout'
@@ -24,7 +25,20 @@ const cols:GridColDef[] = [
         )
     }
   },
-  {field: 'title', headerName: 'Nombre Producto', width: 200},
+  {
+    field: 'title',
+    headerName: 'Nombre Producto',
+    width: 200,
+    renderCell: ({row}:GridValueGetterParams) => {
+      return (
+        <NextLink href={`/admin/products/${ row.slug }`} passHref>
+          <Link underline='always'>
+          { row.title }
+          </Link>
+        </NextLink>
+      )
+    }
+  },
   {field: 'gender', headerName: 'Género'},
   {field: 'type', headerName: 'Tipo de Accesorio'},
   {field: 'inStock', headerName: 'Inventario'},

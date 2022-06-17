@@ -2,9 +2,8 @@ import { db } from "./";
 import { IProduct } from "../interfaces";
 import { Product } from "../models";
 
-export const getProductsBySlug = async (
-  slug: string
-): Promise<IProduct | null> => {
+export const getProductsBySlug = async ( slug: string ):Promise<IProduct | null> => {
+
   await db.connect();
   const product = await Product.findOne({ slug }).lean();
   await db.disconnect();
@@ -12,6 +11,8 @@ export const getProductsBySlug = async (
   if (!product) {
     return null;
   }
+
+  // Todo: Procesamiento de las imagenes al subirlas al server
 
   return JSON.parse(JSON.stringify(product));
 };
@@ -50,5 +51,5 @@ export const getAllProducts = async(): Promise<IProduct[]> => {
   await db.disconnect();
 
   return JSON.parse(JSON.stringify(products));
- 
+
 }
