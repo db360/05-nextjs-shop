@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useForm } from 'react-hook-form';
 
@@ -37,6 +37,7 @@ interface Props {
 
 const ProductAdminPage:FC<Props> = ({ product }) => {
     const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null); //ref para usar el boton de cargar con el input
 
     const [ newTagValue, setNewTagValue ] = useState('');
     const [ isSaving, setIsSaving ] = useState(false);
@@ -88,6 +89,26 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
     const onDeleteTag = ( tag: string ) => {
         const updatedTags = getValues('tags').filter( t => t !== tag );
         setValue('tags', updatedTags, {shouldValidate: true})
+    }
+
+    const onFilesSelected = async({ target }: ChangeEvent<HTMLInputElement>) => {
+        if( !target.files || target.files.length === 0) {
+            return;
+        }
+
+        // console.log(target.files);
+        try {
+            // console.log(file)
+            for( const file of target.files){
+                const formData = new FormData();
+                formData.append('file', file);
+                const { data } = await shopApi.post<{message: string}>('/admin/upload', formData);
+                console.log( data );
+
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const onSubmit = async( form: FormData ) => {
@@ -313,9 +334,21 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                                 fullWidth
                                 startIcon={ <UploadOutlined /> }
                                 sx={{ mb: 3 }}
+                                // llama al valor del input ref en ese momento y si existe llama click
+                                onClick={() => fileInputRef.current?.click() }
+
                             >
                                 Cargar imagen
                             </Button>
+                            <input
+                                ref={ fileInputRef }
+                                title='upload picture'
+                                type="file"
+                                multiple
+                                accept="image/png, image/gif, image/jpeg"
+                                style={{ display: 'none'}}
+                                onChange={ onFilesSelected }
+                            />
 
                             <Chip
                                 label="Es necesario al 2 imagenes"
