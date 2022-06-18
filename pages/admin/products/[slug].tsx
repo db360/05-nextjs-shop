@@ -7,6 +7,7 @@ import { DriveFileRenameOutline, SaveOutlined, UploadOutlined } from '@mui/icons
 import { dbProducts } from '../../../database';
 import { Box, Button, capitalize, Card, CardActions, CardMedia, Checkbox, Chip, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, ListItem, Paper, Radio, RadioGroup, TextField } from '@mui/material';
 import { AdminLayout } from '../../../components/layout';
+import { shopApi } from '../../../api';
 
 
 const validTypes  = ['shirts','pants','hoodies','hats']
@@ -34,7 +35,8 @@ interface Props {
 
 const ProductAdminPage:FC<Props> = ({ product }) => {
 
-    const [ newTagValue, setNewTagValue ] = useState('')
+    const [ newTagValue, setNewTagValue ] = useState('');
+    const [ isSaving, setIsSaving ] = useState(false);
 
     const { register, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm<FormData>({
         defaultValues: product
@@ -42,7 +44,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
 
     useEffect(() => {
         const subscription = watch( ( value, {name, type} ) => {  // subscription para manejar el watch y poder pararlo en el return
-            console.log({value, name, type})
+            // console.log({value, name, type})
             if( name === 'title' ) {
                 const newSlug = value.title?.trim()
                     .replaceAll(' ', '_')
@@ -85,8 +87,30 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
         setValue('tags', updatedTags, {shouldValidate: true})
     }
 
-    const onSubmit = ( form: FormData) => {
-        console.log({form})
+    const onSubmit = async( form: FormData ) => {
+
+        if( form.images.length < 2 ) return alert('Mínimo son dos imágenes');
+
+        setIsSaving(true);
+
+        try {
+            const { data } = await shopApi({
+                url: '/admin/products',
+                method: 'PUT', // si tenemos _id, si no, crear
+                data: form
+            })
+            console.log({data});
+            if( !form._id) {
+                // Todo: recargar navegador
+            } else {
+
+                setIsSaving(false);
+            }
+        } catch (error) {
+            console.log(error);
+            setIsSaving(false);
+
+        }
     }
 
     return (
@@ -102,6 +126,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                         startIcon={ <SaveOutlined /> }
                         sx={{ width: '150px' }}
                         type="submit"
+                        disabled={ isSaving }
                         >
                         Guardar
                     </Button>
@@ -298,7 +323,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             <Grid container spacing={2}>
                                 {
                                     product.images.map( img => (
-                                        <Grid item xs={4} sm={3} key={img}>
+                                        <Grid item xs={3} sm={4} key={img}>
                                             <Card>
                                                 <CardMedia
                                                     component='img'
@@ -350,7 +375,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     return {
         props: {
             product
-        }
+        },
+        revalidate: 60 * 60 * 24
     }
 }
 

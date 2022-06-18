@@ -13,7 +13,7 @@ const cols:GridColDef[] = [
     headerName: 'Imagen',
     renderCell: ({row}:GridValueGetterParams) => {
         return (
-            <a href={`products/${row.slug}`} target="_blank" rel="noreferrer">
+            <a href={`/product/${row.slug}`} target="_blank" rel="noreferrer">
                 {' '}
                 <CardMedia
                     component='img'

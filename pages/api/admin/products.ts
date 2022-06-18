@@ -19,7 +19,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
             return updateProduct(req, res);
 
         case 'POST':
-
+            return createProduct(req, res);
 
         default:
             return res.status(400).json({message: 'Bad Request'});
@@ -47,7 +47,7 @@ const  updateProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) =>
         return res.status(400).json({ message: 'El Id del producto no es válido' });
     }
 
-    if( images.length <= 2 ) {
+    if( images.length < 2 ) {
         return res.status(400).json({ message: 'Se Necesitan al menos dos imágenes' });
     }
 
@@ -64,7 +64,7 @@ const  updateProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) =>
 
         await product.update( req.body );
         await db.disconnect();
-        
+
         return res.status(200).json( product )
 
     } catch (error) {
@@ -73,5 +73,39 @@ const  updateProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) =>
         await db.disconnect();
         return res.status(400).json({ message: 'ERROR: Revisar la consola del servidor'})
     }
+}
+
+
+const createProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
+
+    const { images = [] } = req.body as IProduct;
+
+    if( images.length < 2 ) {
+        return res.status(400).json({ message: 'El producto necesita al menos 2 imágenes.'})
+    }
+
+    // todo: Posiblenente tendremos un localhost:3000/products/xxxxx.jpg
+
+    try {
+        await db.connect();
+        const productInDB = await Product.findOne({ slug: req.body.slug}); //buscar por slu
+        if(productInDB){
+            await db.disconnect();
+            return res.status(400).json({message: 'Ya existe un producto con el mismo slug'});
+        }
+
+        const product = new Product( req.body );
+        await product.save();
+        await db.disconnect();
+
+        return res.status(201).json( product );
+
+    } catch (error) {
+        
+        await db.disconnect();
+        return res.status(400).json({ message: 'Revisar logs del servidor.'})
+    }
+
+
 }
 
