@@ -8,6 +8,8 @@ import { dbProducts } from '../../../database';
 import { Box, Button, capitalize, Card, CardActions, CardMedia, Checkbox, Chip, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, ListItem, Paper, Radio, RadioGroup, TextField } from '@mui/material';
 import { AdminLayout } from '../../../components/layout';
 import { shopApi } from '../../../api';
+import { Product } from '../../../models';
+import { useRouter } from 'next/router';
 
 
 const validTypes  = ['shirts','pants','hoodies','hats']
@@ -34,6 +36,7 @@ interface Props {
 }
 
 const ProductAdminPage:FC<Props> = ({ product }) => {
+    const router = useRouter();
 
     const [ newTagValue, setNewTagValue ] = useState('');
     const [ isSaving, setIsSaving ] = useState(false);
@@ -96,12 +99,12 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
         try {
             const { data } = await shopApi({
                 url: '/admin/products',
-                method: 'PUT', // si tenemos _id, si no, crear
+                method: form._id ? 'PUT' : 'POST', // si tenemos _id, si no, crear
                 data: form
             })
             console.log({data});
             if( !form._id) {
-                // Todo: recargar navegador
+                router.replace(`/admin/products/${ form.slug }`)
             } else {
 
                 setIsSaving(false);
@@ -360,7 +363,19 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
     const { slug = ''} = query;
 
-    const product = await dbProducts.getProductsBySlug(slug.toString());
+    let product: IProduct | null;
+
+    if( slug === 'new' ) {
+        //todo: crear un producto
+
+        const tempProduct = JSON.parse( JSON.stringify( new Product() ) );
+        delete tempProduct._id;
+        tempProduct.images = ['img1.jpg', 'img2.jpg'];
+        product = tempProduct;
+
+    } else {
+        product = await dbProducts.getProductsBySlug( slug.toString() );
+    }
 
     if ( !product ) {
         return {
@@ -376,7 +391,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         props: {
             product
         },
-        revalidate: 60 * 60 * 24
+        // revalidate: 60 * 60 * 24
     }
 }
 
