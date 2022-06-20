@@ -1,8 +1,14 @@
-import { isValidObjectId } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { isValidObjectId } from 'mongoose';
+
+import {v2 as cloudinary} from 'cloudinary';
+
 import { db } from '../../../database';
 import { IProduct } from '../../../interfaces';
 import { Product } from '../../../models';
+
+cloudinary.config( process.env.CLOUDINARY_URL || '');
+
 
 type Data =
 |   {message: string;}
@@ -36,9 +42,17 @@ const  getProducts = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
 
     await db.disconnect();
 
-    // todo: Actualizar imagenes
+    //Actualizar imagenes
+    const updatedProducts = products.map( product => {
 
-    res.status(200).json(products);
+        product.images = product.images.map( image => {
+        return image.includes('http') ? image : `${ process.env.HOST_NAME }products/${ image }`
+      });
+
+      return product;
+      })
+
+    res.status(200).json(updatedProducts);
 }
 const  updateProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
 
@@ -60,7 +74,18 @@ const  updateProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) =>
             await db.disconnect();
             return res.status(400).json({ message: 'No existe ningun producto con ese ID' + _id})
         }
-        // todo: eliminar imagenes en Cloudinary
+
+        // https://res.cloudinary.com/da-b-martinez/image/upload/v1655741683/x5vyojaxkqhdarvhcerc.png
+
+        product.images.forEach(async(image) => {
+            if( !images.includes(image)) {
+                //Borrar de cloudinary
+                const [fileId, extension] = image.substring( image.lastIndexOf('/') + 1).split('.') //buscar el indice del ultimo /
+                console.log({image, fileId, extension});
+                await cloudinary.uploader.destroy(fileId) //eliminar de cloudinary
+
+            }
+        })
 
         await product.update( req.body );
         await db.disconnect();
@@ -101,7 +126,7 @@ const createProduct = async(req: NextApiRequest, res: NextApiResponse<Data>) => 
         return res.status(201).json( product );
 
     } catch (error) {
-        
+
         await db.disconnect();
         return res.status(400).json({ message: 'Revisar logs del servidor.'})
     }

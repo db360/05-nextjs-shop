@@ -70,3 +70,4 @@ const uploadFile = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
     return res.status(200).json({ message: imgUrl})
 
 }
+
