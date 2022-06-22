@@ -77,9 +77,9 @@ const OrderPage:NextPage<Props> = ({order}) => {
             (
                 <Chip
             sx={{my: 2}}
-            label="Pagada"
+            label="Pendiente de Pago"
             variant="outlined"
-            color="success"
+            color="error"
             icon={<CreditScoreOutlined />}
         />
             )
